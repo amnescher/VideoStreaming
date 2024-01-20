@@ -8,7 +8,7 @@ from PIL import Image
 from typing import Optional, List
 from pydantic import BaseModel
 from fastapi import Request
-
+import os
 
 
         
@@ -79,6 +79,7 @@ class FastAPIDeployment:
         except Exception as e:
             self.logger.error(f"Error in base endpoint: {e}")
             return {"error": str(e)}
+
 
 # Deploy the deployment
 serve.start()
