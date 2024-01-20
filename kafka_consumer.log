@@ -2,3 +2,9 @@
 2024-01-20 10:02:57,950 DEBUG:Model output: predicted: hi
 2024-01-20 10:03:13,438 INFO:Consumed: camera_1, 0, 10, None, b'Consuming from Kafka with Ray!', 1705744993433
 2024-01-20 10:03:13,438 DEBUG:Model output: predicted: Consuming from Kafka with Ray!
+2024-01-20 10:13:14,535 WARNING:Heartbeat failed for group ray-group because it is rebalancing
+2024-01-20 10:13:26,549 WARNING:Heartbeat failed for group ray-group because it is rebalancing
+2024-01-20 10:13:41,337 INFO:Consumed: camera_1, 0, 11, None, b'hi', 1705745620332
+2024-01-20 10:13:41,337 DEBUG:Model output: predicted: hi
+2024-01-20 10:14:12,901 INFO:Consumed: camera_1, 0, 12, None, b'This is an example of sending message to ray ', 1705745651895
+2024-01-20 10:14:12,902 DEBUG:Model output: predicted: This is an example of sending message to ray 
