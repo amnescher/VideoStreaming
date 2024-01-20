@@ -11,7 +11,16 @@ from fastapi import Request
 import os
 from ray.serve.handle import DeploymentHandle
 import ray
+import yaml
 # Define the Input class
+class Config:
+    def __init__(self, **entries):
+        self.__dict__.update(entries)
+
+
+with open("config.yaml", 'r') as file:
+    config = yaml.safe_load(file)
+    config = Config(**config)
 class Input(BaseModel):
     img_path: str
     camera_id: Optional[str]
@@ -19,7 +28,13 @@ class Input(BaseModel):
 # Define a FastAPI app and wrap it in a deployment with a route handler.
 app = FastAPI()
 
-@serve.deployment(route_prefix="/")
+# Define the Inference class
+@serve.deployment(autoscaling_config={
+        "min_replicas": config.inference["min_replicas"],
+        "initial_replicas": config.inference["initial_replicas"],
+        "max_replicas": config.inference["max_replicas"],
+        "target_num_ongoing_requests_per_replica": config.inference["target_num_ongoing_requests_per_replica"],
+        "graceful_shutdown_timeout_s": config.inference["graceful_shutdown_timeout_s"]}, route_prefix="/")
 @serve.ingress(app)
 class Inference:
     def __init__(self, Classifier1: DeploymentHandle, Classifier2: DeploymentHandle,):
@@ -46,7 +61,15 @@ class Inference:
             return {"error": str(e)}
     
 
-@serve.deployment(num_replicas=1)
+
+
+@serve.deployment(ray_actor_options={"num_gpus": config.classifier1["num_gpus"]},autoscaling_config={
+        "min_replicas": config.classifier1["min_replicas"],
+        "initial_replicas": config.classifier1["initial_replicas"],
+        "max_replicas": config.classifier1["max_replicas"],
+        "target_num_ongoing_requests_per_replica": config.classifier1["target_num_ongoing_requests_per_replica"],
+        "graceful_shutdown_timeout_s": config.classifier1["graceful_shutdown_timeout_s"],})
+
 class Classifier1:
     def __init__(self):
         # Configure logging to write to a file
@@ -59,8 +82,11 @@ class Classifier1:
         self.logger = logging.getLogger(__name__)
         self.logger.propagate = True
         self.logger.info("Initializing model 1 ...")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.logger.info(f"Using device: {self.device}")
         self.model = models.resnet18(pretrained=True)
         self.model.eval()
+        self.model.to(self.device)
         self.transform = transforms.Compose([
             transforms.Resize(256),
             transforms.CenterCrop(224),
@@ -69,16 +95,17 @@ class Classifier1:
         ])
         
         self.logger.info("Model 1 initialized")
-    @serve.batch(max_batch_size=2)
+    @serve.batch(max_batch_size=config.classifier1["max_batch_size"],batch_wait_timeout_s=config.classifier1["batch_wait_timeout_s"]) 
     async def handle_batch(self, requests: List[Input]):
         inputs = []
         for request in requests:
             try:
                 image = Image.open(request.img_path)
-                inputs.append(self.transform(image))
+                transformed_image = self.transform(image)
+                inputs.append(transformed_image.to(self.device))  # Move tensor to the same device as model
             except Exception as e:
                 self.logger.error(f"Error processing image at path {request.img_path}: {e}")
-                inputs.append(torch.zeros([3, 224, 224]))  # Placeholder for failed images
+                inputs.append(torch.zeros([3, 224, 224], device=self.device))  # Placeholder for failed images
         inputs = torch.stack(inputs)
         try:
             with torch.no_grad():
@@ -98,7 +125,12 @@ class Classifier1:
             self.logger.error(f"Error in base endpoint: {e}")
             return {"error": str(e)}
         
-@serve.deployment(num_replicas=1)
+@serve.deployment(ray_actor_options={"num_gpus": config.classifier2["num_gpus"]},autoscaling_config={
+        "min_replicas": config.classifier2["min_replicas"],
+        "initial_replicas": config.classifier2["initial_replicas"],
+        "max_replicas": config.classifier2["max_replicas"],
+        "target_num_ongoing_requests_per_replica": config.classifier2["target_num_ongoing_requests_per_replica"],
+        "graceful_shutdown_timeout_s": config.classifier2["graceful_shutdown_timeout_s"],})
 class Classifier2:
     def __init__(self):
         # Configure logging to write to a file
@@ -111,8 +143,11 @@ class Classifier2:
         self.logger = logging.getLogger(__name__)
         self.logger.propagate = True
         self.logger.info("Initializing model 2...")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.logger.info(f"Using device: {self.device}")
         self.model = models.resnet18(pretrained=True)
         self.model.eval()
+        self.model.to(self.device)
         self.transform = transforms.Compose([
             transforms.Resize(256),
             transforms.CenterCrop(224),
@@ -127,10 +162,11 @@ class Classifier2:
         for request in requests:
             try:
                 image = Image.open(request.img_path)
-                inputs.append(self.transform(image))
+                transformed_image = self.transform(image)
+                inputs.append(transformed_image.to(self.device))  # Move tensor to the same device as model
             except Exception as e:
                 self.logger.error(f"Error processing image at path {request.img_path}: {e}")
-                inputs.append(torch.zeros([3, 224, 224]))  # Placeholder for failed images
+                inputs.append(torch.zeros([3, 224, 224], device=self.device))  # Placeholder for failed images
         inputs = torch.stack(inputs)
         try:
             with torch.no_grad():

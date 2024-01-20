@@ -1,20 +1,2 @@
-2024-01-20 18:58:25,545 - INFO - Predictions: tensor([952])
-2024-01-20 19:01:15,887 - INFO - Predictions: tensor([952])
-2024-01-20 19:01:59,606 - INFO - Initializing model...
-2024-01-20 19:01:59,749 - INFO - Model initialized
-2024-01-20 19:02:03,469 - INFO - Returned result: ObjectRef(95e8628ce58fdc84c02a503594f7a03661f525770100000001000000)
-2024-01-20 19:02:03,569 - INFO - Predictions: tensor([952])
-2024-01-20 19:03:58,025 - INFO - Initializing model...
-2024-01-20 19:03:58,168 - INFO - Model initialized
-2024-01-20 19:04:03,885 - ERROR - Error in Inference service: 'object_refs' must either be an ObjectRef or a list of ObjectRefs.
-2024-01-20 19:04:03,999 - INFO - Predictions: tensor([952])
-2024-01-20 19:10:20,732 - INFO - Initializing model...
-2024-01-20 19:10:20,771 - INFO - Initializing model...
-2024-01-20 19:10:20,875 - INFO - Model initialized
-2024-01-20 19:10:20,914 - INFO - Model initialized
-2024-01-20 19:12:28,294 - INFO - Initializing model...
-2024-01-20 19:12:28,330 - INFO - Initializing model...
-2024-01-20 19:12:28,443 - INFO - Model initialized
-2024-01-20 19:12:28,473 - INFO - Model initialized
-2024-01-20 19:12:50,802 - INFO - Predictions: tensor([952])
-2024-01-20 19:12:50,817 - INFO - Predictions: tensor([952])
+2024-01-20 20:26:17,887 - INFO - Predictions classifier 1: tensor([952], device='cuda:0')
+2024-01-20 20:26:17,930 - INFO - Predictions classifier 1: tensor([952], device='cuda:0')
