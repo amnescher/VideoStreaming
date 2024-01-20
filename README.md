@@ -12,3 +12,9 @@ Verify Topic Creation
 ```
 kafka-topics --list --bootstrap-server localhost:9092
 ```
+Send message
+
+```
+kafka-console-producer --topic camera_1 --bootstrap-server localhost:9092
+
+```

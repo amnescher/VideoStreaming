@@ -1,0 +1,6 @@
+2024-01-20 17:46:51,643 - INFO - Initializing model...
+2024-01-20 17:46:51,785 - INFO - Model initialized
+2024-01-20 17:47:05,661 - ERROR - Error processing image at path /home/ubuntu/Elm/VideoStreaming/cat.jpg: cannot identify image file '/home/ubuntu/Elm/VideoStreaming/cat.jpg'
+2024-01-20 17:47:05,722 - INFO - Predictions: tensor([623])
+2024-01-20 17:47:45,929 - ERROR - Error processing image at path cat.jpg: cannot identify image file 'cat.jpg'
+2024-01-20 17:47:46,007 - INFO - Predictions: tensor([623])
