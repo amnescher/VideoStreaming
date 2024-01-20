@@ -17,7 +17,6 @@ class Config:
     def __init__(self, **entries):
         self.__dict__.update(entries)
 
-
 with open("config.yaml", 'r') as file:
     config = yaml.safe_load(file)
     config = Config(**config)
@@ -98,28 +97,33 @@ class Classifier1:
     @serve.batch(max_batch_size=config.classifier1["max_batch_size"],batch_wait_timeout_s=config.classifier1["batch_wait_timeout_s"]) 
     async def handle_batch(self, requests: List[Input]):
         inputs = []
+        camera_ids = []
         for request in requests:
             try:
                 image = Image.open(request.img_path)
                 transformed_image = self.transform(image)
                 inputs.append(transformed_image.to(self.device))  # Move tensor to the same device as model
+                camera_ids.append(request.camera_id)  # Store camera_id for logging
             except Exception as e:
                 self.logger.error(f"Error processing image at path {request.img_path}: {e}")
                 inputs.append(torch.zeros([3, 224, 224], device=self.device))  # Placeholder for failed images
+                camera_ids.append(request.camera_id)  # Store camera_id for logging
+
         inputs = torch.stack(inputs)
         try:
             with torch.no_grad():
                 predictions = self.model(inputs)
                 _, predicted = torch.max(predictions, 1)
-            self.logger.info(f"Predictions classifier 1: {predicted}")
-            return [predicted.item() for predicted in predicted]
+            # Log predictions with corresponding camera_ids
+            for camera_id, prediction in zip(camera_ids, predicted):
+                self.logger.info(f"Camera ID: {camera_id}, Prediction classifier 1: {prediction.item()}")
+            return [prediction.item() for prediction in predicted]
         except Exception as e:
             self.logger.error(f"Error during model prediction: {e}")
             return ["Error" for _ in requests]
 
     async def __call__(self, request: Input):
         try:
-            
             return await self.handle_batch(request)
         except Exception as e:
             self.logger.error(f"Error in base endpoint: {e}")
@@ -156,24 +160,30 @@ class Classifier2:
         ])
         
         self.logger.info("Model 2 initialized")
-    @serve.batch(max_batch_size=2)
+    @serve.batch(max_batch_size=config.classifier2["max_batch_size"],batch_wait_timeout_s=config.classifier2["batch_wait_timeout_s"])
     async def handle_batch(self, requests: List[Input]):
         inputs = []
+        camera_ids = []
         for request in requests:
             try:
                 image = Image.open(request.img_path)
                 transformed_image = self.transform(image)
                 inputs.append(transformed_image.to(self.device))  # Move tensor to the same device as model
+                camera_ids.append(request.camera_id)  # Store camera_id for logging
             except Exception as e:
                 self.logger.error(f"Error processing image at path {request.img_path}: {e}")
                 inputs.append(torch.zeros([3, 224, 224], device=self.device))  # Placeholder for failed images
+                camera_ids.append(request.camera_id)  # Store camera_id for logging
+
         inputs = torch.stack(inputs)
         try:
             with torch.no_grad():
                 predictions = self.model(inputs)
                 _, predicted = torch.max(predictions, 1)
-            self.logger.info(f"Predictions classifier 2: {predicted}")
-            return [predicted.item() for predicted in predicted]
+            # Log predictions with corresponding camera_ids
+            for camera_id, prediction in zip(camera_ids, predicted):
+                self.logger.info(f"Camera ID: {camera_id}, Prediction classifier 2: {prediction.item()}")
+            return [prediction.item() for prediction in predicted]
         except Exception as e:
             self.logger.error(f"Error during model prediction: {e}")
             return ["Error" for _ in requests]
@@ -185,8 +195,8 @@ class Classifier2:
         except Exception as e:
             self.logger.error(f"Error in base endpoint: {e}")
             return {"error": str(e)}
+
 # Initialize Ray and Serve
-# Deploy the deployment
-        
+# Deploy the deployment        
 serve.start()
 serve.run(Inference.bind(Classifier1.bind(),Classifier2.bind()),name = "Inference")
