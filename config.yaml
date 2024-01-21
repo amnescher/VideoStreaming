@@ -1,26 +1,26 @@
 classifier1:
   num_gpus: 0.1
   min_replicas: 1
-  initial_replicas: 2
-  max_replicas: 10
-  target_num_ongoing_requests_per_replica: 10
+  initial_replicas: 1
+  max_replicas: 20
+  target_num_ongoing_requests_per_replica: 32
   graceful_shutdown_timeout_s: 60
-  max_batch_size: 1
+  max_batch_size: 32
   batch_wait_timeout_s: 0.5
   
 classifier2:
   num_gpus: 0.1
   min_replicas: 1
-  initial_replicas: 2
-  max_replicas: 10
-  target_num_ongoing_requests_per_replica: 10
+  initial_replicas: 1
+  max_replicas: 20
+  target_num_ongoing_requests_per_replica: 32
   graceful_shutdown_timeout_s: 60
-  max_batch_size: 1
+  max_batch_size: 32
   batch_wait_timeout_s: 0.5
   
 inference:
   min_replicas: 1
-  initial_replicas: 2
+  initial_replicas: 1
   max_replicas: 10
-  target_num_ongoing_requests_per_replica: 100
+  target_num_ongoing_requests_per_replica: 64
   graceful_shutdown_timeout_s: 60

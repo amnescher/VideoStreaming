@@ -31,8 +31,8 @@ async def send_requests_concurrently(batch_size, interval, duration):
 # Function to run the async function from a running event loop
 async def run_async_main():
     batch_size = 150
-    interval_seconds = 0.5  # Interval between batches
-    duration_seconds = 5
+    interval_seconds = 0.1  # Interval between batches
+    duration_seconds = 120
     response_times = await send_requests_concurrently(batch_size, interval_seconds, duration_seconds)
 
     # Calculate the average response time
