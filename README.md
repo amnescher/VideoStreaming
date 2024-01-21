@@ -29,9 +29,17 @@ Pull the Code
 Clone the repository to your local machine or download the source code.
 
 ## Install Dependencies
-Install Docker with GPU support as per your system's requirements.
+Install Docker with GPU support as per your system's requirements [here]('https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html').
+
 Create a Python virtual environment and activate it.
-Install the required Python packages using pip install -r requirements.txt (ensure that you have a requirements.txt file in your project).
+```
+virtualenv dev
+source dev/bin/activate
+```
+Install the required Python packages (ensure that you have a requirements.txt file in your project).
+```
+pip install -r requirements.txt
+```
 ## Run Apache Kafka
 Apache Kafka is used as a distributed event store and for stream-processing. Follow these steps to set up Kafka:
 
@@ -80,6 +88,7 @@ python ray_producer.py
 ## To Do:
 Packaging and Containerization of Ray Producer and Service Deployment.
 
+Improve time to deployment using Ray model store. 
 ## The following video demonstrates a test of the pipeline's autoscaling capabilities when the producer component sends a large number of requests.
 
 
