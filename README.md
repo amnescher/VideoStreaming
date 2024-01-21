@@ -78,3 +78,6 @@ python ray_producer.py
 
 ## To Do:
 Packaging and contarisation of ray producer and service deployment. 
+
+https://github.com/amnescher/VideoStreaming/assets/112868804/e2f94b86-f254-4d45-85aa-3b0ca54f03d9
+
