@@ -7,11 +7,14 @@ from torchvision import models, transforms
 from PIL import Image
 from typing import Optional, List
 from pydantic import BaseModel
-from fastapi import Request
-import os
 from ray.serve.handle import DeploymentHandle
 import ray
 import yaml
+import asyncio
+from aiokafka import AIOKafkaConsumer
+import logging
+import requests
+import ray
 # Define the Input class
 class Config:
     def __init__(self, **entries):
@@ -23,6 +26,60 @@ with open("config.yaml", 'r') as file:
 class Input(BaseModel):
     img_path: str
     camera_id: Optional[str]
+
+
+
+# Configure logging
+log_file = 'kafka_consumer.log'
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s:%(message)s', filename=log_file, filemode='a')
+logging.getLogger('aiokafka').setLevel(logging.WARNING)
+
+
+@ray.remote
+class RayConsumer:
+    def __init__(self, topic, inference_engine_url):
+        self.inference_engine_url = inference_engine_url
+        self.topic = topic
+        self.healthy = True
+
+    async def consume(self):
+        loop = asyncio.get_running_loop()
+
+        self.consumer = AIOKafkaConsumer(
+            self.topic,
+            bootstrap_servers='localhost:29092',
+            group_id="ray-group",
+            loop=loop)
+        
+        try:
+            await self.consumer.start()
+            logging.info("Successfully connected to Kafka server")
+
+            async for msg in self.consumer:
+                logging.info(f"Consumed: {msg.topic}, {msg.partition}, {msg.offset}, {msg.key}, {msg.value}, {msg.timestamp}")
+                payload = {"img_path": msg.value.decode('utf-8'), "camera_id": msg.topic}
+                response = requests.post(self.inference_engine_url, json=payload)
+                logging.debug(f"Model output: {response.json()}")
+
+        except Exception as e:
+            logging.error(f"Error in message consumption: {e}")
+            self.healthy = False
+        finally:
+            await self.consumer.stop()
+            self.healthy = False
+            logging.info("Kafka Consumer stopped")
+
+
+async def run_consumer(topic, url):
+    consumer = RayConsumer.remote(topic, url)
+    await consumer.consume.remote()
+
+async def main():
+    topics = ["camera_1", "camera_2"]  # Add more topics as needed
+    inference_engine_url = "http://localhost:8000/inference"
+    tasks = [run_consumer(topic, inference_engine_url) for topic in topics]
+    await asyncio.gather(*tasks)
+
 
 # Define a FastAPI app and wrap it in a deployment with a route handler.
 app = FastAPI()
@@ -197,6 +254,8 @@ class Classifier2:
             return {"error": str(e)}
 
 # Initialize Ray and Serve
-# Deploy the deployment        
+# Deploy the deployment   
+ray.init() 
 serve.start()
 serve.run(Inference.bind(Classifier1.bind(),Classifier2.bind()),name = "Inference")
+asyncio.run(main())

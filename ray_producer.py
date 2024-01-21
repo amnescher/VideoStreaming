@@ -52,7 +52,7 @@ video_files = [
 ]
 
 # Frame rate settings
-fps = 1
+fps = 25
 kafka_server = 'localhost:29092'
 
 async def run_ray_task(task):
