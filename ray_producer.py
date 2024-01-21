@@ -47,7 +47,7 @@ class VideoProcessor:
 # Example usage
 video_files = [
     {'path': 'video1.mp4', 'dir': 'frames/camera1', 'topic': 'camera_1'},
-    # {'path': 'video2.mp4', 'dir': 'frames/camera2', 'topic': 'camera_2'},
+     {'path': 'video2.mp4', 'dir': 'frames/camera2', 'topic': 'camera_2'},
     # Add more videos here
 ]
 
@@ -71,5 +71,4 @@ async def main():
 
 # Running the main coroutine
 asyncio.run(main())
-
 

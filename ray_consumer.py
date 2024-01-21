@@ -51,11 +51,10 @@ async def run_consumer(topic, url):
     await consumer.consume.remote()
 
 async def main():
-    topics = ["camera_1"]  # Add more topics as needed
+    topics = ["camera_1", "camera_2"]  # Add more topics as needed
     inference_engine_url = "http://localhost:8000/inference"
     tasks = [run_consumer(topic, inference_engine_url) for topic in topics]
     await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
     asyncio.run(main())
-

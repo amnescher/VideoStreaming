@@ -4,7 +4,7 @@ docker exec -it broker /bin/sh
 
 ```
 ```
-kafka-topics --create --topic camera_1 --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
+kafka-topics --create --topic camera_2 --bootstrap-server localhost:9092 --partitions 1 --replication-factor 1
 ```
 
 Verify Topic Creation
