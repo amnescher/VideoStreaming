@@ -85,6 +85,37 @@ Once the cluster is runing, you can run the event producer to feed the kafka ser
 python ray_producer.py
 ```
 
+Certainly! Improving the readability and clarity of your README file is essential for effective communication with users. Here's a revised version of the provided section:
+
+---
+
+## Cluster Configuration
+
+### `config.yaml` File
+
+This file contains the configuration settings for your Ray cluster. It allows you to define the specifications of your cluster, including node types and resources. Additionally, it includes policies for the cluster's autoscaling behavior. By fine-tuning these configurations, you can optimize the cluster's performance to suit your specific needs.
+
+
+
+#### Factors Influencing the Processing Rate
+
+The processing rate of AI models in this pipeline is influenced by several key factors:
+
+1. **GPU Capacity**: The ability of the GPU to accommodate the maximum number of AI model replicas.
+2. **Cluster Configuration**: The configuration of your cluster including, initial replica, max replica, and so on 
+2. **Batch Sizes**: The size of dynamic batches processed by the AI models.
+3. **Request Queue**: The number of ongoing requests per queue.
+
+By adjusting these parameters, you can significantly impact the frame rate per second achieved by your AI models.
+
+#### To measure the processing rate:
+
+1. Ensure your cluster is configured according to your requirements.
+2. Run the `send_request.py` script. This script sends concurrent requests to your cluster, simulating a real-world load.
+
+The script will log the processing rate, measured in responses per second, into the `responsetime.log` file. This log provides valuable insights into the performance of your cluster under different configurations and workloads.
+
+
 ## To Do:
 Packaging and Containerization of Ray Producer and Service Deployment.
 
