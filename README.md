@@ -18,3 +18,9 @@ Send message
 kafka-console-producer --topic camera_1 --bootstrap-server localhost:9092
 
 ```
+
+Make the script executable 
+```
+chmod +x kafka-init.sh
+
+```

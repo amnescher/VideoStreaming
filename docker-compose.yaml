@@ -19,6 +19,9 @@ services:
       - zookeeper
     ports:
       - "29092:29092"
+    volumes:
+      - ./kafka-init.sh:/kafka-init.sh  # Mount the entrypoint script
+    entrypoint: ["/bin/bash", "/kafka-init.sh"]  # Set the entrypoint script
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
