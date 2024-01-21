@@ -78,13 +78,10 @@ python ray_producer.py
 ```
 
 ## To Do:
-<<<<<<< HEAD
 Packaging and Containerization of Ray Producer and Service Deployment.
 
 ## The following video demonstrates a test of the pipeline's autoscaling capabilities when the producer component sends a large number of requests.
-=======
-Packaging and contarisation of ray producer and service deployment. 
+
 
 https://github.com/amnescher/VideoStreaming/assets/112868804/e2f94b86-f254-4d45-85aa-3b0ca54f03d9
->>>>>>> 28f6d00bc65fa01374fe91103c972a2e210150cb
 
