@@ -72,9 +72,13 @@ service_deployment.py
 
 Once the cluster is runing, you can run the event producer to feed the kafka server with event and  the will be processed you the conseumer and consequently by my services. 
 
+**Note:**  Multiple cameras are needed to feed video frames to the producer. To simplify the system for testing, two video clips are used to simulate the incoming video from cameras. These videos are sampled at 30fps to mimic a real camera scenario. Only minimal modifications to the producer are required to enable it to read videos from cameras instead of clips.
 ```
 python ray_producer.py
 ```
 
 ## To Do:
-Packaging and contarisation of ray producer and service deployment. 
+Packaging and Containerization of Ray Producer and Service Deployment.
+
+## The following video demonstrates a test of the pipeline's autoscaling capabilities when the producer component sends a large number of requests.
+
