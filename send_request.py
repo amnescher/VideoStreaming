@@ -35,8 +35,8 @@ async def send_requests_concurrently(batch_size, interval, duration):
 
 async def run_async_main():
     batch_size = 150
-    interval_seconds = 0.2  # Interval between batches
-    duration_seconds = 20
+    interval_seconds = 0.1  # Interval between batches
+    duration_seconds = 40
     response_counter = await send_requests_concurrently(batch_size, interval_seconds, duration_seconds)
 
     # Log the count of responses per second

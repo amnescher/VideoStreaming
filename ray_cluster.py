@@ -15,7 +15,7 @@ from aiokafka import AIOKafkaConsumer
 import logging
 import requests
 import ray
-# Define the Input class
+
 class Config:
     def __init__(self, **entries):
         self.__dict__.update(entries)
@@ -23,6 +23,8 @@ class Config:
 with open("config.yaml", 'r') as file:
     config = yaml.safe_load(file)
     config = Config(**config)
+
+# Define the Input class
 class Input(BaseModel):
     img_path: str
     camera_id: Optional[str]
@@ -34,7 +36,9 @@ log_file = 'kafka_consumer.log'
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s:%(message)s', filename=log_file, filemode='a')
 logging.getLogger('aiokafka').setLevel(logging.WARNING)
 
-
+'''
+This is a class definition for a RayConsumer, which is a remote class in the Ray framework. 
+consume: Asynchronously consumes messages from a Kafka server, processes the messages, and handles exceptions while consuming messages.'''
 @ray.remote
 class RayConsumer:
     def __init__(self, topic, inference_engine_url):
@@ -84,6 +88,8 @@ async def main():
 # Define a FastAPI app and wrap it in a deployment with a route handler.
 app = FastAPI()
 
+
+
 # Define the Inference class
 @serve.deployment(autoscaling_config={
         "min_replicas": config.inference["min_replicas"],
@@ -126,6 +132,8 @@ class Inference:
         "target_num_ongoing_requests_per_replica": config.classifier1["target_num_ongoing_requests_per_replica"],
         "graceful_shutdown_timeout_s": config.classifier1["graceful_shutdown_timeout_s"],})
 
+
+# Define the Classifier1 class
 class Classifier1:
     def __init__(self):
         # Configure logging to write to a file
@@ -185,7 +193,8 @@ class Classifier1:
         except Exception as e:
             self.logger.error(f"Error in base endpoint: {e}")
             return {"error": str(e)}
-        
+
+# Define the Classifier2 class  
 @serve.deployment(ray_actor_options={"num_gpus": config.classifier2["num_gpus"]},autoscaling_config={
         "min_replicas": config.classifier2["min_replicas"],
         "initial_replicas": config.classifier2["initial_replicas"],
@@ -254,8 +263,9 @@ class Classifier2:
             return {"error": str(e)}
 
 # Initialize Ray and Serve
-# Deploy the deployment   
+  
 ray.init() 
 serve.start()
+# define model combination and deployment
 serve.run(Inference.bind(Classifier1.bind(),Classifier2.bind()),name = "Inference")
 asyncio.run(main())

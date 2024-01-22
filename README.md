@@ -9,9 +9,19 @@ The diagram above provides an overview of the designed pipeline, along with corr
 
 There are up to 150 cameras transmitting HD-quality videos to the producer. The producer's role is to receive video frames and store them in a memory bucket, shared among different components in the pipeline. It extracts the name, path to the bucket, and camera ID for each frame, then sends this information as messages to topics in the Kafka server. There is a topic on the Kafka server for each camera, named from camera_1 to camera_150.
 
-To efficiently process the large volume of frames sent from the cameras to the producer, the producer is parallelized using ray actors. Multiple actors are responsible for processing frames from each camera, and the number of actors can be scaled up or down as needed. The Kafka server, used as a distributed event streaming platform, runs as a Docker image. There is a separate topic for each camera to manage them individually.
+To effectively handle the substantial volume of frames received from the cameras, the producer employs parallel processing using ray actors. Each actor is dedicated to processing video frames from a single camera. The efficiency and parallelization of the producer are further augmented by utilizing the async/wait functionality of Python. This approach allows for non-blocking communication with Kafka, ensuring that the rest of the code continues to execute uninterrupted. Each actor is capable of independently executing asynchronous operations. With multiple actors (one for each camera) running concurrently, each operates its own event loop, enabling simultaneous processing of multiple video streams. The process involves:
 
-The consumer is designed similarly to the producer, with multiple actors running in parallel. Each actor in the consumer receives messages from Kafka topics. Multiple actors may be responsible for each topic. The messages received by consumers, containing the path to video frames (stored in a bucket) and the camera ID, are sent to a ray deployment cluster in HTTP requests.
+1: Each actor retrieves frames from its respective camera.
+
+2: Frames are processed and prepared for transmission (e.g., storing in the bucket).
+
+3: Frame paths are sent to Kafka asynchronously.
+
+As these operations within each actor are asynchronous, there is no idle time while waiting for Kafka's I/O operations to finish.
+ 
+The Kafka server, used as a distributed event streaming platform, runs as a Docker image. There is a separate topic for each camera to manage them individually.
+
+The consumer mirrors the design of the producer, utilizing multiple parallel-running actors. Each actor within the consumer is linked to a specific Kafka topic corresponding to a camera. Similar to the producer, communication with the Kafka server in each actor is asynchronous. This design prevents any delay in receiving subsequent messages, thereby enhancing the consumer's efficiency. Each message received by the consumer includes the path to video frames (stored in the shared memory bucket) and the camera ID. Messages received by each actor are then formatted into HTTP requests and dispatched to a ray cluster. This setup ensures efficient handling of the data stream from each camera, maintaining the system's overall performance and responsiveness.
 
 The ray cluster, which contains several models including an inference service and multiple AI models, receives these requests. The inference service downloads the image from the bucket and sends it to multiple AI models for parallel processing. Notably, all parallel processing is designed in an asynchronous manner to avoid any bottlenecks in the system. The models run predictions on the images and save the results in a log file. Each model in the ray cluster has a queue for requests, an initial number of replicas, minimum and maximum replica counts, and a policy for starting new replicas. When the number of requests in the queue of each replica exceeds a preset value, a new replica of that model is started to address requests more quickly. Additionally, dynamic batch processing is added to each model, allowing a batch of images to be processed for maximum GPU utilization.
 
@@ -117,6 +127,7 @@ By adjusting these parameters, you can significantly impact the frame rate per s
 
 The script will log the processing rate, measured in responses per second, into the `responsetime.log` file. This log provides insights into the performance of your cluster under different configurations and workloads.
 
+With a 15 GB GPU memory and after experimenting with several configurations, I achieved a processing rate of 230 frames per second using the ray_cluster, which operates two image classifiers (ResNet18) in parallel. Higher FPS can be achieved by utilizing a high-performance infrastructure and optimal configuration of the cluster.
 
 ## To Do:
 Packaging and Containerization of Ray Producer and Service Deployment.
