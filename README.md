@@ -26,6 +26,9 @@ The consumer mirrors the design of the producer, utilizing multiple parallel-run
 The ray cluster, which contains several models including an inference service and multiple AI models, receives these requests. The inference service downloads the image from the bucket and sends it to multiple AI models for parallel processing. Notably, all parallel processing is designed in an asynchronous manner to avoid any bottlenecks in the system. The models run predictions on the images and save the results in a log file. Each model in the ray cluster has a queue for requests, an initial number of replicas, minimum and maximum replica counts, and a policy for starting new replicas. When the number of requests in the queue of each replica exceeds a preset value, a new replica of that model is started to address requests more quickly. Additionally, dynamic batch processing is added to each model, allowing a batch of images to be processed for maximum GPU utilization.
 
 Depending on the GPU infrastructure, the ray cluster configuration can be adjusted for maximum request handling. All producers, consumers, and the ray cluster can be executed either on a ray engine on a single-node, multiple-GPU infrastructure, or, for a multi-node, multi-GPU setup, the pipeline can be submitted (without any changes) as a job to a Kubernetes/KubeRay cluster.
+
+Notably, individual GPU and CPU resources are shared among different models, multiple replicas of each model, and actors, through the configuration of the cluster. This allows for maximum utilization of infrastructure via resource sharing.
+
 #### This repository contains a video processing pipeline designed to operate on a Ray/KubeRay cluster, leveraging the power of distributed computing for efficient handling and processing of video data.
 
 ## Requirements
