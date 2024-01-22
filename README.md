@@ -5,6 +5,8 @@
 
 # Video Processing Pipeline Deployed on Ray/KubeRay Cluster
 
+#### This repository contains a AI video recognition pipeline designed to operate on a Ray/KubeRay cluster, leveraging the power of distributed computing for efficient handling and processing large number of video frames.
+
 The diagram above provides an overview of the designed pipeline, along with corresponding MLOps technologies. This pipeline is defined for a smart surveillance system and comprises four main components: producer, Kafka server, consumer, and model composition (Ray cluster). The following explains each component.
 
 There are up to 150 cameras transmitting HD-quality videos to the producer. The producer's role is to receive video frames and store them in a memory bucket, shared among different components in the pipeline. It extracts the name, path to the bucket, and camera ID for each frame, then sends this information as messages to topics in the Kafka server. There is a topic on the Kafka server for each camera, named from camera_1 to camera_150.
@@ -29,7 +31,7 @@ Depending on the GPU infrastructure, the ray cluster configuration can be adjust
 
 Notably, individual GPU and CPU resources are shared among different models, multiple replicas of each model, and actors, through the configuration of the cluster. This allows for maximum utilization of infrastructure via resource sharing.
 
-#### This repository contains a video processing pipeline designed to operate on a Ray/KubeRay cluster, leveraging the power of distributed computing for efficient handling and processing of video data.
+
 
 ## Requirements
 ### Hardware
