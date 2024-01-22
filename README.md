@@ -139,5 +139,9 @@ Improve time to deployment using Ray model store.
 ## The following video demonstrates a test of the pipeline's autoscaling capabilities when the producer component sends a large number of requests.
 
 
-https://github.com/amnescher/VideoStreaming/assets/112868804/e2f94b86-f254-4d45-85aa-3b0ca54f03d9
+
+
+
+
+https://github.com/amnescher/VideoStreaming/assets/112868804/a6cc4338-734d-4d23-bf45-1ad177f726ce
 
