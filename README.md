@@ -55,6 +55,8 @@ This script is responsible for generating 150 topics named 'camera_1' to 'camera
 Start the Kafka Server and Topics
 Use Docker Compose to start the Kafka server along with the 150 topics:
 
+**Note**: The creation of 150 topics may take several seconds.
+
 ```
 sudo docker compose up -d
 ```
@@ -75,7 +77,7 @@ kafka-topics --list --bootstrap-server localhost:9092
 The Ray cluster consists of a Kafka consumer service that receives events from the Kafka server. These events are then fed into ML microservices for processing by various image processing services.
 
 ```
-service_deployment.py
+python ray_cluster.py
 ```
 
 Once the cluster is runing, you can run the event producer to feed the kafka server with event and  the will be processed you the conseumer and consequently by my services. 
@@ -113,7 +115,7 @@ By adjusting these parameters, you can significantly impact the frame rate per s
 1. Ensure your cluster is configured according to your requirements.
 2. Run the `send_request.py` script. This script sends concurrent requests to your cluster, simulating a real-world load.
 
-The script will log the processing rate, measured in responses per second, into the `responsetime.log` file. This log provides valuable insights into the performance of your cluster under different configurations and workloads.
+The script will log the processing rate, measured in responses per second, into the `responsetime.log` file. This log provides insights into the performance of your cluster under different configurations and workloads.
 
 
 ## To Do:
