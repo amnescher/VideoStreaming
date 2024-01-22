@@ -67,7 +67,7 @@ chmod +x kafka-init.sh
 
 This script is responsible for generating 150 topics named 'camera_1' to 'camera_150', which are used by the event producer and consumer components of the application.
 
-Start the Kafka Server and Topics
+### Start the Kafka Server
 Use Docker Compose to start the Kafka server along with the 150 topics:
 
 **Note**: The creation of 150 topics may take several seconds.
@@ -76,7 +76,7 @@ Use Docker Compose to start the Kafka server along with the 150 topics:
 sudo docker compose up -d
 ```
 
-You can verify the creation of the topics by accessing the Kafka broker container and listing the topics:
+**Optional:** You can verify the creation of the topics by accessing the Kafka broker container and listing the topics:
 
 ```
 docker exec -it broker /bin/sh
@@ -89,28 +89,26 @@ kafka-topics --list --bootstrap-server localhost:9092
 
 ## Run Ray Cluster
 
-The Ray cluster consists of a Kafka consumer service that receives events from the Kafka server. These events are then fed into ML microservices for processing by various image processing services.
+The Ray cluster consists of a Kafka consumer service that receives events from the Kafka server. These events are then fed into ML models for processing by various image processing models.
 
 ```
 python ray_cluster.py
 ```
 
-Once the cluster is runing, you can run the event producer to feed the kafka server with event and  the will be processed you the conseumer and consequently by my services. 
+Once the cluster is runing, you can run the event producer to feed the kafka server with event (video frames) and  they will be used by conseumer and consequently by my AI models. 
 
 **Note:**  Multiple cameras are needed to feed video frames to the producer. To simplify the system for testing, two video clips are used to simulate the incoming video from cameras. These videos are sampled at 30fps to mimic a real camera scenario. Only minimal modifications to the producer are required to enable it to read videos from cameras instead of clips.
 ```
 python ray_producer.py
 ```
-
-Certainly! Improving the readability and clarity of your README file is essential for effective communication with users. Here's a revised version of the provided section:
-
+The prediction of AI models are stored in `ray_cluster.log`, created by the cluster.
 ---
 
 ## Cluster Configuration
 
 ### `config.yaml` File
 
-This file contains the configuration settings for your Ray cluster. It allows you to define the specifications of your cluster, including node types and resources. Additionally, it includes policies for the cluster's autoscaling behavior. By fine-tuning these configurations, you can optimize the cluster's performance to suit your specific needs.
+This file contains the configuration settings for your Ray cluster. It allows you to define the specifications of your cluster, including types of the required resources (e.g. CPU/GPU), number of replicas for each AI models. Additionally, it includes policies for the cluster's autoscaling behavior. By fine-tuning these configurations, you can optimize the cluster's performance to suit your specific needs.
 
 
 
