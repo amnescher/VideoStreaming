@@ -44,7 +44,7 @@ Pull the Code
 Clone the repository to your local machine or download the source code.
 
 ## Install Dependencies
-Install Docker with GPU support as per your system's requirements [here]('https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html').
+Install Docker with GPU support as per your system's requirements [here](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/index.html).
 
 Create a Python virtual environment and activate it.
 ```
