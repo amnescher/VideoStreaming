@@ -1,3 +1,5 @@
+This repository contains a minimal prototype for running a text similarity search using FAISS within a Docker container.
+
 ## To build the container.
 ```
 docker build -t faiss-text-search .
